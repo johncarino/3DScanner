@@ -1,0 +1,2 @@
+/usr/bin/aarch64-linux-gnu-ar qc libgrabber.a CMakeFiles/grabber.dir/grabber.c.o
+/usr/bin/aarch64-linux-gnu-ranlib libgrabber.a
