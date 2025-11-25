@@ -1,2 +1,2 @@
-/usr/bin/aarch64-linux-gnu-ar qc libhal.a CMakeFiles/hal.dir/src/hal.c.o
+/usr/bin/aarch64-linux-gnu-ar qc libhal.a CMakeFiles/hal.dir/src/camera.c.o CMakeFiles/hal.dir/src/stepper.c.o
 /usr/bin/aarch64-linux-gnu-ranlib libhal.a

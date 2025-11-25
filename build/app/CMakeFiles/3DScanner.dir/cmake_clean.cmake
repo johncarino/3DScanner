@@ -1,5 +1,4 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/3DScanner.dir/link.d"
   "3DScanner"
   "3DScanner.pdb"
   "CMakeFiles/3DScanner.dir/src/main.c.o"

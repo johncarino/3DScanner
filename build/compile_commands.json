@@ -1,20 +1,17 @@
 [
 {
-  "directory": "/home/john/ensc351/work/3D scanner/build/hal",
-  "command": "/usr/bin/aarch64-linux-gnu-gcc  -I\"/home/john/ensc351/work/3D scanner/hal/hal/include\" -I\"/home/john/ensc351/work/3D scanner/hal/include\" -g -std=gnu11 -Wall -Werror -Wpedantic -Wextra -fdiagnostics-color -fsanitize=address -pthread -o CMakeFiles/hal.dir/src/hal.c.o -c \"/home/john/ensc351/work/3D scanner/hal/src/hal.c\"",
-  "file": "/home/john/ensc351/work/3D scanner/hal/src/hal.c",
-  "output": "hal/CMakeFiles/hal.dir/src/hal.c.o"
+  "directory": "/home/john/ensc351/work/3DScanner/build/hal",
+  "command": "/usr/bin/aarch64-linux-gnu-gcc  -I/home/john/ensc351/work/3DScanner/hal/hal/include -I/home/john/ensc351/work/3DScanner/hal/include -g -Wall -Werror -Wpedantic -Wextra -fdiagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/hal.dir/src/camera.c.o -c /home/john/ensc351/work/3DScanner/hal/src/camera.c",
+  "file": "/home/john/ensc351/work/3DScanner/hal/src/camera.c"
 },
 {
-  "directory": "/home/john/ensc351/work/3D scanner/build/app",
-  "command": "/usr/bin/aarch64-linux-gnu-gcc  -I\"/home/john/ensc351/work/3D scanner/app/include\" -I\"/home/john/ensc351/work/3D scanner/hal/include\" -I\"/home/john/ensc351/work/3D scanner/grabber/.\" -g -std=gnu11 -Wall -Werror -Wpedantic -Wextra -fdiagnostics-color -fsanitize=address -pthread -o CMakeFiles/3DScanner.dir/src/main.c.o -c \"/home/john/ensc351/work/3D scanner/app/src/main.c\"",
-  "file": "/home/john/ensc351/work/3D scanner/app/src/main.c",
-  "output": "app/CMakeFiles/3DScanner.dir/src/main.c.o"
+  "directory": "/home/john/ensc351/work/3DScanner/build/hal",
+  "command": "/usr/bin/aarch64-linux-gnu-gcc  -I/home/john/ensc351/work/3DScanner/hal/hal/include -I/home/john/ensc351/work/3DScanner/hal/include -g -Wall -Werror -Wpedantic -Wextra -fdiagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/hal.dir/src/stepper.c.o -c /home/john/ensc351/work/3DScanner/hal/src/stepper.c",
+  "file": "/home/john/ensc351/work/3DScanner/hal/src/stepper.c"
 },
 {
-  "directory": "/home/john/ensc351/work/3D scanner/build/grabber",
-  "command": "/usr/bin/aarch64-linux-gnu-gcc  -I\"/home/john/ensc351/work/3D scanner/grabber/.\" -I\"/home/john/ensc351/work/3D scanner/grabber/grabber\" -g -std=gnu11 -fdiagnostics-color -fsanitize=address -pthread -o CMakeFiles/grabber.dir/grabber.c.o -c \"/home/john/ensc351/work/3D scanner/grabber/grabber.c\"",
-  "file": "/home/john/ensc351/work/3D scanner/grabber/grabber.c",
-  "output": "grabber/CMakeFiles/grabber.dir/grabber.c.o"
+  "directory": "/home/john/ensc351/work/3DScanner/build/app",
+  "command": "/usr/bin/aarch64-linux-gnu-gcc  -I/home/john/ensc351/work/3DScanner/app/include -I/home/john/ensc351/work/3DScanner/hal/include -g -Wall -Werror -Wpedantic -Wextra -fdiagnostics-color -fsanitize=address -pthread -std=gnu11 -o CMakeFiles/3DScanner.dir/src/main.c.o -c /home/john/ensc351/work/3DScanner/app/src/main.c",
+  "file": "/home/john/ensc351/work/3DScanner/app/src/main.c"
 }
 ]

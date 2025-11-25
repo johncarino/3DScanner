@@ -1,6 +1,63 @@
-# ENSC351 Build Structure
+# ENSC351 3D Scanner
 
-This is a working project that you can use as the basis for your assignments.
+## General Info
+- This project is a 3D scanner using a BeagleY-AI
+- This project works on the concept of photogrammetry and utilizes the COLMAP Structure-From-Motion and Multi-View Stereo Program
+  - Photogrammetry works by taking a series of overlapping photos at different angles and identifying common points
+  - between the photos to create 3D models.
+
+- The subject is placed on a rotating platter controlled by a stepper motor.
+- The camera's height moves along the Z axis with another stepper motor.
+
+## Prerequisites
+- A NFS between the host computer and the BeagleY-AI must be set up beforehand. This handles the photo file transfer between the host and the BeagleY-AI
+- **Important:** The NFS mount path in the code is `/mnt/nfs_share/myApps`. You must either:
+  - Mount your NFS share at this exact path on the BeagleY-AI, OR
+  - Edit `NFS_PATH`, `CMD_FILE`, and `DONE_FILE` in `app/src/main.c` to match your actual mount point
+- You MUST install the following libraries on your Host and BeagleY-AI board 
+- You also need python3 for the host-side script
+```
+BeagleY-AI:
+sudo apt install -y libgpiod-dev libv4l-dev build-essential cmake
+sudo apt install nfs-common
+```
+- libgpiod-dev - GPIO control for stepper motor
+- libv4l-dev - Video4Linux2 for camera capture
+- build-essential - GCC compiler and build tools
+- cmake - Build system
+
+- Theres an external python script that must be run on the host that detects when a scan has completed.
+- This script also sends the photos taken by the BeagleY-AI over to the COLMAP program for analysis and 3D rendering
+
+```
+Host:
+sudo apt install colmap
+sudo apt install nfs-kernel-server
+```
+
+## Troubleshooting
+- Make sure you double check the wiring for your pins and that the BeagleY-AI is using the correct GPIO layer. You can check this using
+```
+gpiodetect
+```
+- gpiodetect will give you a list of GPIO layers available on the board.
+```
+gpioinfo gpiochip# 
+```
+- gpioinfo gpiochip# list the available pins on that specific layer, and some additional information. 
+
+- You must also need to confirm whether your webcam is being read by the BeagleY-AI
+- The following command in the terminal on the BeagleY-AI helps with this 
+```
+ls -l /dev/video*
+```
+- To get camera device info, run the following on the BeagleY-AI terminal, this assumes you have v4l2-ctl installed!
+```
+v4l2-ctl --list-devices
+v4l2-ctl -d /dev/video3 --list-formats-ext
+```
+- **Note:** The camera device is currently set to `/dev/video3` in `hal/src/camera.c` (line 28). If your camera appears as `/dev/video0` or another device, edit that line accordingly.
+
 
 ## Sturcture
 
@@ -28,9 +85,34 @@ This is a working project that you can use as the basis for your assignments.
   └── README.md
 ```  
 
-Note: This application is just to help you get started! It also has a bug in its computation (just for fun!)
+## Operation Modes
 
-## Usage
+The scanner supports multiple operation modes:
+
+1. **Auto Mode (Default)**: Waits for `start_scan.txt` trigger file from host Python script
+   - Runs automatically when the executable starts with no arguments
+   - Initializes both camera and stepper motor
+   - Listens for trigger file at `/mnt/nfs_share/myApps/start_scan.txt`
+   - Performs full 360° rotation with 20 pictures
+   - Creates `done.txt` when complete to signal the host
+
+2. **Manual Mode**: For testing without stepper motor
+   - Run: `./3DScanner manual`
+   - Takes 20 photos with 9-second intervals
+   - You manually rotate the object between captures
+   - Still signals host when complete
+
+3. **Test Stepper**: Tests stepper motor movement only
+   - Run: `./3DScanner test_stepper`
+   - Moves 400 steps forward, then 400 steps backward
+
+4. **Test Camera**: Tests camera capture only
+   - Run: `./3DScanner test_camera`
+   - Captures a single test image (scan999.jpg)
+
+## Building and Running
+
+### Initial Setup
 
 - Install CMake: `sudo apt update` and `sudo apt install cmake`
 - When you first open the project, click the "Build" button in the status bar for CMake to generate the `build\` folder and recreate the makefiles.
@@ -81,6 +163,47 @@ To manually run CMake from the command line use:
   # Build (compile & link) the project
   cmake --build build
 ```
+
+### Running the Scanner
+
+**On the BeagleY-AI:**
+```bash
+cd ~/ensc351/public/myApps
+./3DScanner              # Auto mode (waits for host trigger)
+./3DScanner manual       # Manual mode (timed intervals)
+./3DScanner test_stepper # Test stepper only
+./3DScanner test_camera  # Test camera only
+```
+
+**On the Host (Python script):**
+- Create `start_scan.txt` in the NFS shared folder to trigger a scan
+- The BeagleY-AI will delete this file and begin scanning
+- Wait for `done.txt` to appear in the shared folder
+- Your Python script can then import photos from `/mnt/nfs_share/myApps/scan*.jpg` into COLMAP
+
+## Configuration
+
+### Adjustable Parameters (in `app/src/main.c`):
+
+- `STEPS_PER_ROTATION`: Total steps for 360° (default: 3200)
+- `TOTAL_PICTURES`: Number of photos per scan (default: 20)
+- `NFS_PATH`: Path to shared folder (default: `/mnt/nfs_share/myApps`)
+- `CMD_FILE`: Trigger file path
+- `DONE_FILE`: Completion signal file path
+
+### Hardware Configuration (in `hal/include/stepper.h`):
+
+- `GPIO_CHIP`: GPIO chip name (default: `"gpiochip0"`)
+- `STEP_PIN`: GPIO pin for stepper step signal (default: 23)
+- `DIR_PIN`: GPIO pin for stepper direction (default: 24)
+
+### Camera Configuration (in `hal/src/camera.c`):
+
+- `dev_name`: Camera device (default: `/dev/video3`)
+- Resolution: 1920x1080 MJPEG (lines 57-59)
+- `SKIP_FRAMES`: Number of frames to discard before saving (default: 5)
+- this helps by discarding blurry photos
+
 
 ## Finer Points
 

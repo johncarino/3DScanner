@@ -1,11 +1,8 @@
-/home/john/ensc351/work/3D scanner/build/CMakeFiles/edit_cache.dir
-/home/john/ensc351/work/3D scanner/build/CMakeFiles/rebuild_cache.dir
-/home/john/ensc351/work/3D scanner/build/hal/CMakeFiles/hal.dir
-/home/john/ensc351/work/3D scanner/build/hal/CMakeFiles/edit_cache.dir
-/home/john/ensc351/work/3D scanner/build/hal/CMakeFiles/rebuild_cache.dir
-/home/john/ensc351/work/3D scanner/build/app/CMakeFiles/3DScanner.dir
-/home/john/ensc351/work/3D scanner/build/app/CMakeFiles/edit_cache.dir
-/home/john/ensc351/work/3D scanner/build/app/CMakeFiles/rebuild_cache.dir
-/home/john/ensc351/work/3D scanner/build/grabber/CMakeFiles/grabber.dir
-/home/john/ensc351/work/3D scanner/build/grabber/CMakeFiles/edit_cache.dir
-/home/john/ensc351/work/3D scanner/build/grabber/CMakeFiles/rebuild_cache.dir
+/home/john/ensc351/work/3DScanner/build/CMakeFiles/edit_cache.dir
+/home/john/ensc351/work/3DScanner/build/CMakeFiles/rebuild_cache.dir
+/home/john/ensc351/work/3DScanner/build/hal/CMakeFiles/hal.dir
+/home/john/ensc351/work/3DScanner/build/hal/CMakeFiles/edit_cache.dir
+/home/john/ensc351/work/3DScanner/build/hal/CMakeFiles/rebuild_cache.dir
+/home/john/ensc351/work/3DScanner/build/app/CMakeFiles/3DScanner.dir
+/home/john/ensc351/work/3DScanner/build/app/CMakeFiles/edit_cache.dir
+/home/john/ensc351/work/3DScanner/build/app/CMakeFiles/rebuild_cache.dir

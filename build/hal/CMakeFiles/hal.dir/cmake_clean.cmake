@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/hal.dir/src/hal.c.o"
-  "CMakeFiles/hal.dir/src/hal.c.o.d"
+  "CMakeFiles/hal.dir/src/camera.c.o"
+  "CMakeFiles/hal.dir/src/camera.c.o.d"
+  "CMakeFiles/hal.dir/src/stepper.c.o"
+  "CMakeFiles/hal.dir/src/stepper.c.o.d"
   "libhal.a"
   "libhal.pdb"
 )

@@ -1,0 +1,35 @@
+=
+
+  => Completed observations: 0
+  => Merged observations: 0
+  => Retriangulated observations: 0
+
+==============================================================================
+Global bundle adjustment
+==============================================================================
+
+iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_iter  iter_time  total_time
+   0  1.682160e+03    0.00e+00    2.49e+03   0.00e+00   0.00e+00  1.00e+04        0    7.20e-03    1.62e-02
+   1  1.678400e+03    3.76e+00    3.07e+01   6.19e+00   1.00e+00  3.00e+04        1    1.56e-02    3.23e-02
+   2  1.678335e+03    6.55e-02    3.28e+00   4.54e+00   1.00e+00  9.00e+04        1    2.12e-02    5.41e-02
+   3  1.678330e+03    4.99e-03    1.34e+00   1.59e+00   1.00e+00  2.70e+05        1    1.69e-02    7.10e-02
+   4  1.678330e+03    1.31e-04    3.39e-01   2.50e-01   1.01e+00  8.10e+05        1    2.05e-02    9.18e-02
+
+
+Bundle adjustment report
+------------------------
+    Residuals : 15502
+   Parameters : 6522
+   Iterations : 5
+         Time : 0.0940609 [s]
+ Initial cost : 0.329412 [px]
+   Final cost : 0.329037 [px]
+  Termination : Convergence
+
+  => Completed observations: 0
+  => Merged observations: 0
+  => Filtered observations: 0
+  => Changed observations: 0.000000
+  => Filtered images: 0
+
+Elapsed time: 0.084 [minutes]

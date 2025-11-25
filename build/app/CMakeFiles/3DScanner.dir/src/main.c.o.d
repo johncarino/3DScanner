@@ -1,5 +1,5 @@
 app/CMakeFiles/3DScanner.dir/src/main.c.o: \
- /home/john/ensc351/work/3D\ scanner/app/src/main.c \
+ /home/john/ensc351/work/3DScanner/app/src/main.c \
  /usr/aarch64-linux-gnu/include/stdc-predef.h \
  /usr/aarch64-linux-gnu/include/stdio.h \
  /usr/aarch64-linux-gnu/include/bits/libc-header-start.h \
@@ -11,8 +11,8 @@ app/CMakeFiles/3DScanner.dir/src/main.c.o: \
  /usr/aarch64-linux-gnu/include/bits/long-double.h \
  /usr/aarch64-linux-gnu/include/gnu/stubs.h \
  /usr/aarch64-linux-gnu/include/gnu/stubs-lp64.h \
- /usr/lib/gcc-cross/aarch64-linux-gnu/14/include/stddef.h \
- /usr/lib/gcc-cross/aarch64-linux-gnu/14/include/stdarg.h \
+ /usr/lib/gcc-cross/aarch64-linux-gnu/12/include/stddef.h \
+ /usr/lib/gcc-cross/aarch64-linux-gnu/12/include/stdarg.h \
  /usr/aarch64-linux-gnu/include/bits/types.h \
  /usr/aarch64-linux-gnu/include/bits/typesizes.h \
  /usr/aarch64-linux-gnu/include/bits/time64.h \
@@ -22,10 +22,37 @@ app/CMakeFiles/3DScanner.dir/src/main.c.o: \
  /usr/aarch64-linux-gnu/include/bits/types/__FILE.h \
  /usr/aarch64-linux-gnu/include/bits/types/FILE.h \
  /usr/aarch64-linux-gnu/include/bits/types/struct_FILE.h \
- /usr/aarch64-linux-gnu/include/bits/types/cookie_io_functions_t.h \
  /usr/aarch64-linux-gnu/include/bits/stdio_lim.h \
  /usr/aarch64-linux-gnu/include/bits/floatn.h \
  /usr/aarch64-linux-gnu/include/bits/floatn-common.h \
+ /usr/aarch64-linux-gnu/include/stdlib.h \
+ /usr/aarch64-linux-gnu/include/bits/waitflags.h \
+ /usr/aarch64-linux-gnu/include/bits/waitstatus.h \
+ /usr/aarch64-linux-gnu/include/sys/types.h \
+ /usr/aarch64-linux-gnu/include/bits/types/clock_t.h \
+ /usr/aarch64-linux-gnu/include/bits/types/clockid_t.h \
+ /usr/aarch64-linux-gnu/include/bits/types/time_t.h \
+ /usr/aarch64-linux-gnu/include/bits/types/timer_t.h \
+ /usr/aarch64-linux-gnu/include/bits/stdint-intn.h \
+ /usr/aarch64-linux-gnu/include/endian.h \
+ /usr/aarch64-linux-gnu/include/bits/endian.h \
+ /usr/aarch64-linux-gnu/include/bits/endianness.h \
+ /usr/aarch64-linux-gnu/include/bits/byteswap.h \
+ /usr/aarch64-linux-gnu/include/bits/uintn-identity.h \
+ /usr/aarch64-linux-gnu/include/sys/select.h \
+ /usr/aarch64-linux-gnu/include/bits/select.h \
+ /usr/aarch64-linux-gnu/include/bits/types/sigset_t.h \
+ /usr/aarch64-linux-gnu/include/bits/types/__sigset_t.h \
+ /usr/aarch64-linux-gnu/include/bits/types/struct_timeval.h \
+ /usr/aarch64-linux-gnu/include/bits/types/struct_timespec.h \
+ /usr/aarch64-linux-gnu/include/bits/pthreadtypes.h \
+ /usr/aarch64-linux-gnu/include/bits/thread-shared-types.h \
+ /usr/aarch64-linux-gnu/include/bits/pthreadtypes-arch.h \
+ /usr/aarch64-linux-gnu/include/bits/atomic_wide_counter.h \
+ /usr/aarch64-linux-gnu/include/bits/struct_mutex.h \
+ /usr/aarch64-linux-gnu/include/bits/struct_rwlock.h \
+ /usr/aarch64-linux-gnu/include/alloca.h \
+ /usr/aarch64-linux-gnu/include/bits/stdlib-float.h \
  /usr/aarch64-linux-gnu/include/unistd.h \
  /usr/aarch64-linux-gnu/include/bits/posix_opt.h \
  /usr/aarch64-linux-gnu/include/bits/environments.h \
@@ -33,4 +60,15 @@ app/CMakeFiles/3DScanner.dir/src/main.c.o: \
  /usr/aarch64-linux-gnu/include/bits/getopt_posix.h \
  /usr/aarch64-linux-gnu/include/bits/getopt_core.h \
  /usr/aarch64-linux-gnu/include/bits/unistd_ext.h \
- /home/john/ensc351/work/3D\ scanner/grabber/./grabber.h
+ /usr/aarch64-linux-gnu/include/string.h \
+ /usr/aarch64-linux-gnu/include/bits/types/locale_t.h \
+ /usr/aarch64-linux-gnu/include/bits/types/__locale_t.h \
+ /usr/aarch64-linux-gnu/include/strings.h \
+ /usr/aarch64-linux-gnu/include/fcntl.h \
+ /usr/aarch64-linux-gnu/include/bits/fcntl.h \
+ /usr/aarch64-linux-gnu/include/bits/fcntl-linux.h \
+ /usr/aarch64-linux-gnu/include/bits/stat.h \
+ /usr/aarch64-linux-gnu/include/bits/struct_stat.h \
+ /usr/aarch64-linux-gnu/include/ctype.h \
+ /home/john/ensc351/work/3DScanner/hal/include/stepper.h \
+ /home/john/ensc351/work/3DScanner/hal/include/camera.h

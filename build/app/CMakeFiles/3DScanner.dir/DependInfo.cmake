@@ -8,16 +8,12 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/john/ensc351/work/3D scanner/app/src/main.c" "app/CMakeFiles/3DScanner.dir/src/main.c.o" "gcc" "app/CMakeFiles/3DScanner.dir/src/main.c.o.d"
-  "" "app/3DScanner" "gcc" "app/CMakeFiles/3DScanner.dir/link.d"
+  "/home/john/ensc351/work/3DScanner/app/src/main.c" "app/CMakeFiles/3DScanner.dir/src/main.c.o" "gcc" "app/CMakeFiles/3DScanner.dir/src/main.c.o.d"
   )
 
-# Targets to which this target links which contain Fortran sources.
-set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
-  )
-
-# Targets to which this target links which contain Fortran sources.
-set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
+# Targets to which this target links.
+set(CMAKE_TARGET_LINKED_INFO_FILES
+  "/home/john/ensc351/work/3DScanner/build/hal/CMakeFiles/hal.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.
