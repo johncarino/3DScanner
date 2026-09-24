@@ -32,6 +32,38 @@ Captured photos are written to the NFS share, where the host-side
 process_scan_full.py detects completion and runs them through COLMAP.
 ```
 
+## Project Gallery
+
+### Scanner setup
+
+<p align="center">
+  <img src="documents/images/scan001.jpg" alt="BeagleY-AI scanner setup" width="900">
+</p>
+
+### Camera placement and scan geometry
+
+<p align="center">
+  <img src="documents/images/camera%20positions.png" alt="Camera positions around the object" width="900">
+</p>
+
+### COLMAP point cloud reconstruction
+
+<p align="center">
+  <img src="documents/images/point%20cloud.png" alt="Point cloud reconstruction" width="900">
+</p>
+
+### Rough mesh reconstruction
+
+<p align="center">
+  <img src="documents/images/rough%20mesh.png" alt="Rough mesh reconstruction" width="900">
+</p>
+
+### Final project poster
+
+<p align="center">
+  <img src="documents/images/projectposter.png" alt="Project poster" width="1100">
+</p>
+
 ## Prerequisites
 - A NFS between the host computer and the BeagleY-AI must be set up beforehand. This handles the photo file transfer between the host and the BeagleY-AI
 - **Important:** The NFS mount path in the code is `/mnt/nfs_share/myApps`. You must either:
