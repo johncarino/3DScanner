@@ -17,5 +17,6 @@ target_link_libraries(3DScanner LINK_PRIVATE hal)
 add_custom_command(TARGET 3DScanner POST_BUILD 
   COMMAND "${CMAKE_COMMAND}" -E copy 
      "$<TARGET_FILE:3DScanner>"
-     "~/ensc351/public/myApps/3DScanner"
-  COMMENT "Copying ARM executable to public NFS directory")
+     #"/home/john/ensc351/public/myApps/3DScanner"
+     /mnt/nfs_share/myApps
+  COMMENT "Copying executable to NFS directory")

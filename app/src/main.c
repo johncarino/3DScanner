@@ -4,14 +4,18 @@
 #include <string.h>
 #include <fcntl.h>
 #include <ctype.h> 
+#include <stdbool.h>
 #include "stepper.h"
 #include "camera.h"
+#include "scanner.h"
+#include "platform_stepper.h"
+#include "height_stepper.h"
+#include "server.h"
 
 #define STEPS_PER_ROTATION 3200
 #define TOTAL_PICTURES 20
-#define NFS_PATH "/mnt/nfs_share/myApps"
-#define CMD_FILE "/mnt/nfs_share/myApps/start_scan.txt"
-#define DONE_FILE "/mnt/nfs_share/myApps/done.txt"
+
+bool programRunning;
 
 void signal_host_complete();
 int test_stepper_only(void);
@@ -20,7 +24,12 @@ int run_manual_timed_sequence(void);
 int run_auto_listening_mode(void);
 static int perform_scan_sequence(void);
 
-// Rotates the motor back and forth to verify wiring.
+// have a two terminals logged into the BeagleY-AI, one to start the server, the other to start the C-app
+// run the python script on a seperate terminal, on the HOST MACHINE to detect and allow COLMAP to process the photos
+
+// COLMAP requires a beefy GPU to process a point cloud from the pictures
+// the time it takes to create said point cloud depends on the # of photos and the quality of the photos   
+
 int test_stepper_only(void) {
     printf("\n[TEST] Starting Stepper Motor Test...\n");
     printf("Moving 400 steps forward...\n");
@@ -34,13 +43,8 @@ int test_stepper_only(void) {
     return 0;
 }
 
-// Takes a SINGLE photo to verify NFS and image quality.
 int test_camera_only(void) {
     printf("\n[TEST] Starting Single Camera Capture Test...\n");
-    
-    // Note: We modify logic slightly to allow custom naming if needed, 
-    // but your camera.c uses "scan%03d.jpg". 
-    // We will just pass '999' as the ID for the test image.
     printf("Capturing image scan999.jpg to %s...\n", NFS_PATH);
     
     if (camera_capture_one_image(NFS_PATH, 999) == 0) {
@@ -52,10 +56,10 @@ int test_camera_only(void) {
     return 0;
 }
 
-// Takes photos on a timer (no motors) so you can move the cam by hand.
+// Takes photos on a timer so you can move the cam by hand.
 int run_manual_timed_sequence(void) {
     printf("\n--- Starting MANUAL Scan Sequence ---\n");
-    printf("You have 5 seconds between shots to move the camera manually.\n");
+    printf("You have 9 seconds between shots to move the camera manually.\n");
     
     for (int i = 0; i < TOTAL_PICTURES; i++) {
         printf("\n[Move Camera Now] ... \n9 seconds remaining\n");
@@ -79,10 +83,7 @@ int run_manual_timed_sequence(void) {
     return 0;
 }
 
-// ---------------------------------------------------------
-// FUNCTION 4: Auto Listening Mode (The Main Production Loop)
 // Waits for 'start_scan.txt' from Host, then runs motors + cam.
-// ---------------------------------------------------------
 int run_auto_listening_mode(void) {
     printf("\n========================================\n");
     printf("   AUTO MODE ACTIVE - WAITING FOR HOST  \n");
@@ -94,10 +95,8 @@ int run_auto_listening_mode(void) {
             printf("\nCommand received! detected %s\n", CMD_FILE);
             unlink(CMD_FILE); // Delete trigger file
 
-            // Run the actual scan logic
             perform_scan_sequence();
 
-            // Tell Host we are done
             signal_host_complete();
             printf("Returning to idle state...\n");
         }
@@ -133,28 +132,35 @@ static int perform_scan_sequence(void) {
     return 0;
 }
 
-void signal_host_complete() {
-    FILE *f = fopen(DONE_FILE, "w");
-    if (f) { fprintf(f, "Scan Complete"); fclose(f); }
-}
-
 int main(void)
 {
-    // if (stepper_init() != 0) fprintf(stderr, "Stepper init warning\n");
     if (camera_init() != 0)  { fprintf(stderr, "Camera init failed\n"); return 1; }
+    
+    server_init();
+    htStepMotor_init();
+    pfStepMotor_init();
+    scanner_init();
 
-    // OPTION A: Test just the motor (moves back and forth)
+    programRunning = true;
+    
+    while (programRunning){
+
+    }
+
+    // these functions are dead code now
+    // this is from a previous implementation before the website was implemented
+    // the thread initialization in scanner.c now handles this work and the main thread just sits empty
+    // these functions won't work anymore
+
     // test_stepper_only();
-
-    // OPTION B: Test just the camera (takes 1 photo to NFS)
     // test_camera_only();
-
-    // OPTION C: Manual Scan (Timed photos, move camera by hand)
-    run_manual_timed_sequence();
-
-    // OPTION D: Production Mode (Wait for Host command)
+    // run_manual_timed_sequence();
     // run_auto_listening_mode();
-    // stepper_cleanup();
+
+    scanner_cleanup();
+    htStepMotor_cleanup();
+    pfStepMotor_cleanup();
     camera_cleanup();
+    server_cleanup();
     return 0;
 }

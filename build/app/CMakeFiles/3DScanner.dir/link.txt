@@ -1,1 +1,0 @@
-/usr/bin/aarch64-linux-gnu-gcc -g -fsanitize=address -pthread CMakeFiles/3DScanner.dir/src/main.c.o -o 3DScanner  ../hal/libhal.a -lgpiod -lv4l2 -lpthread 

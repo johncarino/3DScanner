@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <title>BeagleY 3D-Scanner</title>
+  <meta charset="UTF-8">
+  <link rel='stylesheet' href='/stylesheets/style.css'></link>
+</head>
+
+<body>
+<form>
+  <h1>BeagleY 3D-Scanner</h1>
+  <div>3D Scanner Control Panel</div>
+
+  <div id='content'>
+    <div id='status-box'>
+      <h2>Scanner Status</h2>
+      <div>Mode: <strong><span id="modeid">?</span></strong></div>
+      <div>Status: <strong><span id="stateid">Idle</span></strong></div>
+      <div id='status'>None yet...</div>
+    </div>
+
+    <div id='left-box'>
+      <!-- MODES -->
+      <div id='modediv'>
+        <h2>Mode Selection</h2>
+        <p>Current mode is: <strong><span id="modeid2">?</span></strong></p>
+        <p>
+          <input type="button" id="modeAuto" value="Auto"/>
+          <input type="button" id="modeStandard" value="Standard"/>
+          <input type="button" id="modeCustom" value="Custom"/>
+        </p>
+
+        
+        <div id="customSettings" style="display:none;">
+          <h3>Custom Settings</h3>
+
+          <p>
+            Samples/Rev:
+            <input type="number" id="samplesPerRev" value="20" min="1" max="32" step="1" />
+          </p>
+
+          <p>
+            Height Change:
+            <input type="number" id="heightChange"  value="30" min="1" max="50" step="1" />
+          </p>
+
+          <p>
+            # of Heights:
+            <input type="number" id="numHeights"    value="2" min="1" max="3"  step="1" />
+          </p>
+
+          
+          <p>
+            <input type="button" id="applyCustom" value="Apply Custom"/>
+          </p>
+        </div>
+      </div>
+
+      <!-- BOTTOM CONTROLS -->
+      <div id='control'>
+        <h2>Controls</h2>
+        <p>
+          <input type="button" id="startBtn" value="Start"/>
+          <input type="button" id="pauseBtn" value="Pause"/>
+          <input type="button" id="stopBtn" value="Stop"/>
+        </p>
+
+        <p>
+          <input type="button" id="shutdownBtn" value="Shutdown App"/>
+        </p>
+      </div>
+    </div>
+
+    <div id='error-box'>
+      <h2>Server Error</h2>
+      <p>Server error detected. Please resolve error before continuing.</p>
+      <div><code id='error-text'>No error yet...</code></div>
+    </div>
+
+  </div>
+</form>
+
+<script src='/socket.io/socket.io.js' type='text/javascript'></script>
+<script src='http://code.jquery.com/jquery-1.11.1.min.js' type='text/javascript'></script>
+
+<script src='javascripts/3DScanner_ui.js' type='text/javascript'></script>
+
+<script type="text/javascript">
+  function setModeUI(mode) {
+    document.getElementById("modeid").textContent = mode;
+    document.getElementById("modeid2").textContent = mode;
+    document.getElementById("customSettings").style.display = (mode === "Custom") ? "block" : "none";
+  }
+
+  document.getElementById("modeAuto").onclick = function(){ setModeUI("Auto"); };
+  document.getElementById("modeStandard").onclick = function(){ setModeUI("Standard"); };
+  document.getElementById("modeCustom").onclick = function(){ setModeUI("Custom"); };
+
+  // Default mode display
+  setModeUI("Auto");
+</script>
+</body>
+</html>

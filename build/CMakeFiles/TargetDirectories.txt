@@ -1,8 +1,0 @@
-/home/john/ensc351/work/3DScanner/build/CMakeFiles/edit_cache.dir
-/home/john/ensc351/work/3DScanner/build/CMakeFiles/rebuild_cache.dir
-/home/john/ensc351/work/3DScanner/build/hal/CMakeFiles/hal.dir
-/home/john/ensc351/work/3DScanner/build/hal/CMakeFiles/edit_cache.dir
-/home/john/ensc351/work/3DScanner/build/hal/CMakeFiles/rebuild_cache.dir
-/home/john/ensc351/work/3DScanner/build/app/CMakeFiles/3DScanner.dir
-/home/john/ensc351/work/3DScanner/build/app/CMakeFiles/edit_cache.dir
-/home/john/ensc351/work/3DScanner/build/app/CMakeFiles/rebuild_cache.dir

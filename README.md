@@ -1,234 +1,258 @@
 # ENSC351 3D Scanner
 
-This repository implements an automated photogrammetry scanner built around a BeagleY-AI, a webcam, and two stepper-driven motion axes. The current codebase is more advanced than the earlier single-stepper, file-triggered version: it adds a modular scanner controller, a UDP server, a web UI, multiple scan modes, and a two-height capture workflow intended for higher-quality 3D reconstruction.
+## General Info
+- This project is a 3D scanner using a BeagleY-AI
+- This project works on the concept of photogrammetry and utilizes the COLMAP Structure-From-Motion and Multi-View Stereo Program
+  - Photogrammetry works by taking a series of overlapping photos at different angles and identifying common points
+  - between the photos to create 3D models.
 
-## Project overview
+- The subject is placed on a rotating platter controlled by a "platform" stepper motor.
+- The camera's height moves along the Z axis with a second "height" stepper motor.
+- The scan is controlled remotely through a web UI, served by a Node.js server, which sends commands over UDP to the C application running on the BeagleY-AI.
 
-The scanner captures a sequence of overlapping images from multiple angles and then reuses them with COLMAP to reconstruct a 3D model. The system is designed around:
+## Architecture
 
-- a rotating platform driven by a stepper motor
-- an adjustable camera height driven by a second stepper motor
-- a webcam configured for MJPEG capture
-- an NFS shared directory for transferring images to the host
-- a control interface that sends scan commands over UDP
+```
+Browser (public/index.html + 3DScanner_ui.js)
+        |  socket.io (websocket)
+        v
+server/server.js + server/lib/3DScanner_server.js   <-- Node.js server (port 8088)
+        |  UDP (localhost:12345)
+        v
+app/src/server.c    <-- UDP command server on the BeagleY-AI (hal/server.h)
+        |
+        v
+app/src/scanner.c   <-- scan thread: drives camera + both stepper motors
+        |
+        +--> hal/src/camera.c            (V4L2 camera capture)
+        +--> hal/src/platform_stepper.c  (rotates the platter)
+        +--> hal/src/height_stepper.c    (moves camera height)
 
-This is a production-oriented update relative to the older README, which described only a simpler single-stepper setup and a host trigger file flow.
-
-## Current architecture
-
-The newest code reorganizes the system into several modules:
-
-- `hal/`: low-level hardware drivers for the camera and stepper controllers
-- `app/src/scanner.c`: scan logic and scan-state handling
-- `app/src/server.c`: UDP command server for mode changes and scan starts
-- `app/src/main.c`: system startup and main loop
-- `server/public/`: browser-based control panel for the scanner
-- `server/server.js` and the Node helper files: host-side server/web integration
-
-### Hardware flow
-
-- Platform stepper: rotates the object for each capture
-- Height stepper: changes the camera height between levels
-- Camera: captures still images to the shared NFS folder
-- Web/UI control: sends commands such as mode selection, pause/resume, start, and custom parameters
-
-## Scan workflow
-
-The active scan path in the current project does the following:
-
-1. Start the scanner application on the BeagleY-AI
-2. Start the network/web service used to control the device
-3. Send a command to select a scan mode
-4. Start the scan from the control interface
-5. The app captures images at the configured rotation intervals and height levels
-6. Each image is saved to `/mnt/nfs_share/myApps/scanNNN.jpg`
-7. A host-side COLMAP pipeline can then ingest those images and generate the 3D reconstruction
-
-The current code still writes `done.txt` to the shared folder as a completion signal, but the main operational control path is now the UDP server instead of a polling `start_scan.txt` file.
-
-## Supported modes
-
-The newer scanner supports these modes defined in `hal/include/scanner.h`:
-
-- `STANDARD_AUTO` (`0`): standard single-height scan
-- `DETAILED_AUTO` (`1`): multi-height scan with additional height steps
-- `CUSTOM_MODE` (`2`): custom parameters for sample count, height change, and number of heights
-
-Default values include:
-
-- `DEFAULT_SAMPLE_PER_REV = 20`
-- `DEFAULT_HEIGHT_CHANGE = 30`
-- `SD_NUMBER_OF_HEIGHTS = 1`
-- `DT_NUMBER_OF_HEIGHTS = 2`
-
-The scanner also supports custom configuration values through the UDP command string pattern:
-
-```text
-c <sample_per_rev> <height_change> <num_of_heights>
+Captured photos are written to the NFS share, where the host-side
+process_scan_full.py detects completion and runs them through COLMAP.
 ```
 
-The current web/server flow uses commands like:
-
-```text
-mode 0
-mode 1
-mode 2
-start
-pause toggle
-stop
-shutdown
+## Prerequisites
+- A NFS between the host computer and the BeagleY-AI must be set up beforehand. This handles the photo file transfer between the host and the BeagleY-AI
+- **Important:** The NFS mount path in the code is `/mnt/nfs_share/myApps`. You must either:
+  - Mount your NFS share at this exact path on the BeagleY-AI, OR
+  - Edit `NFS_PATH`, `CMD_FILE`, and `DONE_FILE` in `hal/include/scanner.h` to match your actual mount point
+- You MUST install the following libraries on your Host and BeagleY-AI board 
+- You also need python3 for the host-side script, and Node.js for the web UI server
 ```
-
-## Repository structure
-
-```text
-.
-├── CMakeLists.txt
-├── README.md
-├── app/
-│   ├── CMakeLists.txt
-│   └── src/
-│       ├── main.c
-│       ├── scanner.c
-│       └── server.c
-├── hal/
-│   ├── CMakeLists.txt
-│   ├── include/
-│   │   ├── camera.h
-│   │   ├── height_stepper.h
-│   │   ├── platform_stepper.h
-│   │   ├── scanner.h
-│   │   ├── server.h
-│   │   └── stepper.h
-│   └── src/
-│       ├── camera.c
-│       ├── height_stepper.c
-│       ├── platform_stepper.c
-│       └── stepper.c
-├── server/
-│   ├── fake_scanner_udp
-│   ├── fake_scanner_udp.c
-│   ├── lib/
-│   ├── package.json
-│   ├── public/
-│   └── server.js
-├── build/
-└── documents/
+BeagleY-AI:
+sudo apt install -y libgpiod-dev libv4l-dev build-essential cmake
+sudo apt install nfs-common
 ```
+- libgpiod-dev - GPIO control for stepper motor
+- libv4l-dev - Video4Linux2 for camera capture
+- build-essential - GCC compiler and build tools
+- cmake - Build system
 
-## Requirements
+- Theres an external python script that must be run on the host that detects when a scan has completed.
+- This script also sends the photos taken by the BeagleY-AI over to the COLMAP program for analysis and 3D rendering
 
-### Host machine
-
-Install the host-side tools needed for image processing and shared storage:
-
-```bash
+```
+Host:
 sudo apt install colmap
 sudo apt install nfs-kernel-server
 ```
 
-### BeagleY-AI
-
-Install the required C and camera libraries:
-
-```bash
-sudo apt install -y libgpiod-dev libv4l-dev build-essential cmake
-sudo apt install nfs-common
-```
-
-Common dependencies include:
-
-- `libgpiod-dev` for GPIO access and motor control
-- `libv4l-dev` for webcam capture via V4L2
-- `build-essential` for the C toolchain
-- `cmake` for building the project
-
-## Shared folder and file paths
-
-The code assumes the images are stored in the shared NFS directory:
-
-```text
-/mnt/nfs_share/myApps
-```
-
-The main constants are defined in `hal/include/scanner.h` and include:
-
-- `NFS_PATH` - image output location
-- `CMD_FILE` - legacy trigger file path
-- `DONE_FILE` - scan completion marker
-
-The camera device in the current version is configured in `hal/src/camera.c` and is typically `/dev/video0` depending on hardware detection.
-
-## Building the project
-
-From the project root:
-
-```bash
-cmake -S . -B build
-cmake --build build
-```
-
-If you use VS Code with the CMake Tools extension, you can also build through the editor UI.
-
-## Running the scanner
-
-### On the BeagleY-AI
-
-After building:
-
-```bash
-./build/app/3DScanner
-```
-
-The current C application initializes the camera, starts the UDP server, and waits for scan commands.
-
-### Control commands
-
-The scanner is operated through the UDP server and browser UI rather than only through a local shell interface. Typical commands are:
-
-```text
-mode 0
-mode 1
-mode 2
-start
-pause toggle
-stop
-c 20 30 2
-```
-
-A browser page under `server/public/` can be used to interact with the scanner once the server service is running.
+- The `server/` folder contains a Node.js web UI used to start/stop/configure scans remotely. Install its dependencies with `npm install` inside `server/` (requires `socket.io` and `mime`).
 
 ## Troubleshooting
+- Make sure you double check the wiring for your pins and that the BeagleY-AI is using the correct GPIO layer. You can check this using
+```
+gpiodetect
+```
+- gpiodetect will give you a list of GPIO layers available on the board.
+```
+gpioinfo gpiochip# 
+```
+- gpioinfo gpiochip# list the available pins on that specific layer, and some additional information. 
 
-### Camera detection
-
-Check what camera devices are available:
-
-```bash
+- You must also need to confirm whether your webcam is being read by the BeagleY-AI
+- The following command in the terminal on the BeagleY-AI helps with this 
+```
 ls -l /dev/video*
 ```
-
-Inspect device capabilities:
-
-```bash
+- To get camera device info, run the following on the BeagleY-AI terminal, this assumes you have v4l2-ctl installed!
+```
 v4l2-ctl --list-devices
-v4l2-ctl -d /dev/video0 --list-formats-ext
+v4l2-ctl -d /dev/video3 --list-formats-ext
+```
+- **Note:** The camera device is currently set to `/dev/video3` in `hal/src/camera.c`. If your camera appears as `/dev/video0` or another device, edit that line accordingly.
+
+
+## Structure
+
+- `hal/`: Contains all low-level hardware abstraction layer (HAL) modules (camera, platform stepper, height stepper)
+- `app/`: Contains all application-specific code: `main.c` (entry point), `scanner.c` (scan sequencing/state machine), `server.c` (UDP command listener)
+- `server/`: Node.js web UI + websocket-to-UDP relay used to control the scanner remotely
+- `process_scan_full.py`: Host-side script that watches for a completed scan and runs the COLMAP pipeline
+- `build/`: Generated by CMake; stores all temporary build files (may be deleted to clean)
+
+```
+  .
+  ├── app
+  │   ├── src
+  │   │   ├── main.c      # Entry point: inits camera/motors/server, then idles
+  │   │   ├── scanner.c   # Scan thread: modes, custom settings, scan sequence
+  │   │   └── server.c    # UDP command server (mode/start/stop/pause/shutdown)
+  │   └── CMakeLists.txt           # Sub CMake file, just for app/
+  ├── hal
+  │   ├── include
+  │   │   ├── camera.h
+  │   │   ├── height_stepper.h
+  │   │   ├── platform_stepper.h
+  │   │   ├── scanner.h
+  │   │   ├── server.h
+  │   │   └── stepper.h
+  │   ├── src
+  │   │   ├── camera.c
+  │   │   ├── height_stepper.c
+  │   │   ├── platform_stepper.c
+  │   │   └── stepper.c
+  │   └── CMakeLists.txt           # Sub CMake file, just for hal/
+  ├── server
+  │   ├── server.js               # Static file server + websocket bootstrap (port 8088)
+  │   ├── lib/3DScanner_server.js # Relays websocket commands to the UDP server on the BeagleY-AI
+  │   └── public/                 # Web UI (HTML/CSS/JS)
+  ├── process_scan_full.py        # Host-side COLMAP pipeline trigger
+  ├── CMakeLists.txt               # Main CMake file for the project
+  └── README.md
+```  
+
+## Scan Modes
+
+Scans are configured and triggered from the web UI (or by sending UDP commands directly to port `12345`). The C app supports three modes (see `hal/include/scanner.h`):
+
+1. **Standard** (mode `0`): One height level, `20` samples per revolution
+2. **Detailed** (mode `1`): Two height levels, `20` samples per revolution
+3. **Custom** (mode `2`): User-supplied `samplesPerRev` (1-32), `heightChange` (1-50), and `numHeights` (1-3)
+
+### UDP Commands (handled by `app/src/server.c`, port `12345`)
+
+- `mode 0` / `mode 1` / `mode 2` — select Standard / Detailed / Custom mode
+- `c <samplesPerRev> <heightChange> <numHeights>` — set custom scan parameters
+- `start` — begin the scan sequence in the currently selected mode
+- `pause toggle` — pause/resume the in-progress scan
+- `stop` — stop the in-progress scan
+- `shutdown` — terminate the C application
+
+The scan sequence (`scanObject` in `app/src/scanner.c`) captures a photo, rotates the platform, and repeats for the configured number of samples per revolution, then moves the height stepper and repeats for each additional height level. When complete, it writes `done.txt` to the NFS share to signal the host.
+
+## Building and Running
+
+### Initial Setup
+
+- Install CMake: `sudo apt update` and `sudo apt install cmake`
+- When you first open the project, click the "Build" button in the status bar for CMake to generate the `build\` folder and recreate the makefiles.
+  - When you edit and save a CMakeLists.txt file, VS Code will automatically update this folder.
+- When you add a new file (.h or .c) to the project, you'll need to rerun CMake's build
+  (Either click "Build" or resave `/CMakeLists.txt` to trigger VS Code re-running CMake)
+- Cross-compile using VS Code's CMake addon:
+  - The "kit" defines which compilers and tools will be run.
+  - Change the kit via the menu: Help > Show All Commands, type "CMake: Select a kit".
+    - Kit "GCC 10.2.1 arm-linux-gnueabi" builds for target.
+    - Kit "Unspecified" builds for host (using default `gcc`).
+  - Most CMake options for the project can be found in VS Code's CMake view (very left-hand side).
+- Build the project using Ctrl+Shift+B, or by the menu: Terminal > Run Build Task...
+  - If you try to build but get an error about "build is not a directory", the re-run CMake's build as mentioned above.
+
+## Address Sanitizer
+
+- The address sanitizer built into gcc/clang is very good at catching memory access errors.
+- Enable it by uncomment the `fsanitize=address` lines in the root CMakeFile.txt.
+- For this to run on the BeagleBone, you must run:
+  `sudo apt install libasan6`
+  - Without this installed, you'll get an error:   
+    "error while loading shared libraries: libasan.so.6: cannot open shared object file: No such file or directory"
+
+## Suggested addons
+
+- "CMake Tools" automatically suggested when you open a `CMakeLists.txt` file
+- "Output Colourizer" by IBM 
+    --> Adds colour to the OUTPUT panel in VS Code; useful for seeing CMake messages
+
+## Other Suggestions
+
+- If you are trying to build with 3rd party libraries, you may want to consider the 
+  build setup suggested at the following link. Specificall, see the part on 
+  extracting the BB image to a folder, and then using chroot to run commands like
+  `apt` on that image, which allows you to get libraries for the target on the build system.
+  https://takeofftechnical.com/x-compile-cpp-bbb/
+
+## Manually Running CMake
+
+To manually run CMake from the command line use:
+
+```shell
+  # Regenerate build/ folder and makefiles:
+  rm -rf build/         # Wipes temporary build folder
+  cmake -S . -B build   # Generate makefiles in build\
+
+  # Build (compile & link) the project
+  cmake --build build
 ```
 
-If your board uses a different webcam device, update the `dev_name` value in `hal/src/camera.c`.
+### Running the Scanner
 
-### GPIO and stepper verification
-
-Confirm the board GPIO chips and pin mapping:
-
+**On the BeagleY-AI:**
 ```bash
-gpiodetect
-gpioinfo gpiochip0
+cd ~/ensc351/public/myApps
+./3DScanner              # Starts camera/motor init, the UDP command server, and the scan thread; then idles waiting for commands
 ```
 
-This is important because the steppers and the scanning sequence depend on the correct GPIO layer and pin assignments.
+**Starting the web UI (on the host or any machine that can reach the BeagleY-AI):**
+```bash
+cd server
+npm install
+node server.js           # Serves the UI on http://localhost:8088
+```
+- Open the UI in a browser, pick a scan mode (and custom parameters if applicable), then press Start.
+- The UI relays your commands over a websocket to `server.js`, which forwards them as UDP packets to the BeagleY-AI on port `12345`.
 
-### NFS setup
+**On the Host (Python script):**
+- Once the scan finishes, `app/src/scanner.c` writes `done.txt` to the NFS shared folder
+- Run `process_scan_full.py` on the host to watch for `done.txt`; when it appears, the script runs the photos in `/mnt/nfs_share/myApps/scan*.jpg` through the COLMAP pipeline (feature extraction, matching, sparse and dense reconstruction)
 
-The project expects a working NFS share between the BeagleY-AI and the host. If the path differs from `/mnt/nfs_share/myApps`, update the path constants in the relevant headers and source files before building.
+## Configuration
 
+### Adjustable Parameters (in `hal/include/scanner.h`):
+
+- `PULSE_PER_REV`: Total pulses for 360° on the platform stepper (default: 3200)
+- `DEFAULT_SAMPLE_PER_REV`: Default photos per revolution for Standard/Detailed modes (default: 20)
+- `DEFAULT_HEIGHT_CHANGE`: Default height stepper movement between levels (default: 30)
+- `SD_NUMBER_OF_HEIGHTS` / `DT_NUMBER_OF_HEIGHTS`: Height levels for Standard (1) / Detailed (2) modes
+- `MAX_SAMPLE_PER_REV` / `MAX_HEIGHT_CHANGE` / `MAX_NUMBER_OF_HEIGHTS`: Limits enforced on Custom mode parameters
+- `NFS_PATH`: Path to shared folder (default: `/mnt/nfs_share/myApps`)
+- `CMD_FILE` / `DONE_FILE`: Legacy trigger/completion file paths (superseded by the UDP `start` command and `done.txt` signal)
+
+### Hardware Configuration (in `hal/include/stepper.h`, `hal/include/height_stepper.h`, `hal/include/platform_stepper.h`):
+
+- GPIO chip and pin assignments for both the platform and height stepper motors
+
+### UDP Server Configuration (in `app/src/server.c`):
+
+- `PORT`: UDP port the C app listens on for commands from the Node.js server (default: 12345)
+
+### Web UI Server Configuration (in `server/server.js`):
+
+- `PORT_NUMBER`: HTTP/websocket port for the web UI (default: 8088)
+
+### Camera Configuration (in `hal/src/camera.c`):
+
+- `dev_name`: Camera device (default: `/dev/video3`)
+- Resolution: 1920x1080 MJPEG
+- `SKIP_FRAMES`: Number of frames to discard before saving (default: 5)
+- this helps by discarding blurry photos
+
+
+## Finer Points
+
+- When using the header files in HAL, you'll need to:  
+  `#include "hal/myfile.h`  
+  This extra "hal/..." helps distinguish the low-level access from the higher-level code.
+- One only need to run the CMake build the first time the project loads, and each time the .h and .c file names change, or new ones are added, or ones are removed. This regenerates the `build/Makefile`. Otherwise, just run a normal build (ctrl+shift+B)
+- If desired, one could provide an alternative implementation for the HAL modules that provides a software simulation of the hardware! This could be a useful idea if you have some complex hardware, or limited access to some hardware.

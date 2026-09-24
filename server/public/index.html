@@ -1,0 +1,386 @@
+<!-- MARKER: NEW_UI -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>BeagleY 3D-Scanner | ENSC 351</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="javascripts/3DScanner_ui.js" type="text/javascript"></script>
+
+
+  <style>
+    :root{
+      --bg: #0b1020;
+      --panel: rgba(255,255,255,0.06);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.66);
+      --line: rgba(255,255,255,0.14);
+      --accent: #64b5ff;
+      --bad: #fb7185;
+      --shadow: 0 18px 45px rgba(0,0,0,0.45);
+      --radius: 18px;
+    }
+    *{ box-sizing: border-box; }
+    html,body{ height: 100%; }
+    body{
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(100,181,255,0.35), transparent 60%),
+        radial-gradient(1000px 500px at 90% 10%, rgba(94,234,212,0.22), transparent 55%),
+        radial-gradient(900px 500px at 50% 110%, rgba(251,113,133,0.14), transparent 60%),
+        linear-gradient(180deg, #070a14, var(--bg));
+    }
+    form{ margin: 0; }
+    .wrap{ max-width: 1100px; margin: 0 auto; padding: 28px 18px 92px; }
+
+    .hero{
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.05));
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(500px 200px at 30% 10%, rgba(100,181,255,0.35), transparent 60%),
+        radial-gradient(400px 220px at 70% 0%, rgba(94,234,212,0.18), transparent 55%);
+      filter: blur(10px);
+      opacity: 0.9;
+      pointer-events:none;
+    }
+    .hero > *{ position: relative; }
+
+    h1{
+      margin: 0 0 6px;
+      font-size: clamp(28px, 3.2vw, 44px);
+      letter-spacing: 0.4px;
+      line-height: 1.06;
+    }
+    .subtitle{ color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .badgeRow{ margin-top: 10px; display:flex; gap: 10px; flex-wrap: wrap; }
+    .badge{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.86);
+    }
+    .badge strong{ color: #fff; }
+
+    .team{
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.15);
+      padding: 12px 12px 10px;
+    }
+    .team h3{
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 0.35px;
+      text-transform: uppercase;
+    }
+    .team ul{ margin: 0; padding-left: 18px; color: rgba(255,255,255,0.85); }
+    .team li{ margin: 5px 0; }
+
+    .grid{ margin-top: 16px; display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .card{
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.06);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+      overflow: hidden;
+    }
+    .cardHeader{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      display:flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .cardHeader h2{ margin: 0; font-size: 16px; letter-spacing: 0.2px; }
+    .cardBody{ padding: 14px; }
+
+    .muted{ color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+    .pillRow{ display:flex; gap:10px; flex-wrap:wrap; }
+    .pill{
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.88);
+    }
+    .pill span{ color: #fff; font-weight: 700; }
+
+    .statusBox{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.18);
+      min-height: 72px;
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      color: rgba(255,255,255,0.88);
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+
+    .btnRow{ display:flex; gap:10px; flex-wrap: wrap; margin-top: 10px; }
+    button, input[type="button"]{
+      appearance:none;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+      font-size: 13px;
+    }
+    button:hover, input[type="button"]:hover{
+      background: rgba(255,255,255,0.10);
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,0.26);
+    }
+    button:active, input[type="button"]:active{ transform: translateY(0px); }
+
+    .primary{ border-color: rgba(100,181,255,0.55); background: rgba(100,181,255,0.14); }
+    .primary:hover{ background: rgba(100,181,255,0.20); }
+    .danger{ border-color: rgba(251,113,133,0.55); background: rgba(251,113,133,0.12); }
+    .danger:hover{ background: rgba(251,113,133,0.18); }
+    .active{
+      outline: 2px solid rgba(100,181,255,0.95);
+      background: rgba(100,181,255,0.16) !important;
+    }
+
+    #customSettings{
+      display:none;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px dashed rgba(255,255,255,0.22);
+      background: rgba(0,0,0,0.16);
+    }
+    .field{
+      display:grid;
+      grid-template-columns: 200px 1fr;
+      gap: 10px;
+      align-items:center;
+      margin: 10px 0;
+    }
+    label{ color: rgba(255,255,255,0.86); font-size: 13px; }
+    input[type="number"]{
+      width: 100%;
+      max-width: 220px;
+      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.92);
+      outline: none;
+    }
+    input[type="number"]:focus{
+      border-color: rgba(100,181,255,0.65);
+      box-shadow: 0 0 0 3px rgba(100,181,255,0.18);
+    }
+    .hint{ font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    #error-box{ display:none; }
+    .errorCard{
+      border-color: rgba(251,113,133,0.35);
+      background: rgba(251,113,133,0.10);
+    }
+    .errorText{
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.18);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.9);
+      white-space: pre-wrap;
+    }
+
+    .bottomBar{
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(11,16,32,0.6), rgba(11,16,32,0.92));
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding: 12px 0;
+    }
+    .bottomBar .inner{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 18px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 920px){
+      .hero{ grid-template-columns: 1fr; }
+      .grid{ grid-template-columns: 1fr; }
+      .field{ grid-template-columns: 1fr; }
+      input[type="number"]{ max-width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+<form>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>BeagleY 3D-Scanner</h1>
+        <div class="subtitle">A simple control panel for triggering scans, adjusting modes, and monitoring status.</div>
+        <div class="badgeRow">
+          <div class="badge">Course: <strong>ENSC 351</strong></div>
+          <div class="badge">Mode: <strong><span id="modeid">Standard</span></strong></div>
+          <div class="badge">State: <strong><span id="stateid">Idle</span></strong></div>
+        </div>
+      </div>
+
+      <div class="team">
+        <h3>Team Members</h3>
+        <ul>
+          <li>John Patrick Carino</li>
+          <li>Jamie Whitford</li>
+          <li>John Rod Bigueta</li>
+          <li>Ali Khuwaja</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div id="status-box" class="card">
+        <div class="cardHeader">
+          <h2>Scanner Status</h2>
+          <div class="pillRow">
+            <div class="pill">Mode: <span id="modePill">Standard</span></div>
+            <div class="pill">State: <span id="statePill">Idle</span></div>
+          </div>
+        </div>
+        <div class="cardBody">
+          <div class="muted">Live updates from the scanner will appear here.</div>
+          <div id="status" class="statusBox">Waiting for updates...</div>
+        </div>
+      </div>
+
+      <div id="left-box" class="card">
+        <div class="cardHeader">
+          <h2>Mode Selection</h2>
+          <div class="muted">Choose Standard / Detailed / Custom</div>
+        </div>
+        <div class="cardBody">
+          <div class="btnRow">
+            <input type="button" id="modeStandard" value="Standard" class="active" />
+            <input type="button" id="modeDetailed" value="Detailed" />
+            <input type="button" id="modeCustom" value="Custom" />
+          </div>
+
+          <div id="customSettings">
+            <h3 style="margin:0 0 6px;">Custom Settings</h3>
+            <div class="muted">Only applies when Custom mode is selected.</div>
+
+            <div class="field">
+              <label for="samplesPerRev">Samples / Revolution</label>
+              <input type="number" id="samplesPerRev" value="20" min="15" max="32" step="1" />
+            </div>
+
+            <div class="field">
+              <label for="heightChange">Height Change</label>
+              <input type="number" id="heightChange"  value="30" min="10" max="40" step="1" />
+            </div>
+
+            <div class="field">
+              <label for="numHeights">Number of Heights</label>
+              <input type="number" id="numHeights"    value="2" min="1" max="3"  step="1" />
+            </div>
+
+            <div class="btnRow">
+              <button type="button" id="applyCustom" class="primary">Apply Custom</button>
+            </div>
+
+            <div class="hint">Tip: set Custom values → “Apply Custom” → then press Start.</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="error-box" class="card errorCard" style="grid-column: 1 / -1;">
+        <div class="cardHeader">
+          <h2>Server Error</h2>
+          <div class="pill" style="border-color: rgba(251,113,133,0.45); background: rgba(251,113,133,0.10);">
+            Needs attention
+          </div>
+        </div>
+        <div class="cardBody">
+          <div class="muted">Server error detected. Please resolve error before continuing.</div>
+          <div class="errorText"><code id="error-text">No error yet...</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="bottomBar">
+  <div class="inner">
+    <div class="btnRow" style="margin-top:0;">
+      <button type="button" id="startBtn" class="primary">Start</button>
+      <button type="button" id="pauseBtn">Pause</button>
+      <button type="button" id="stopBtn" class="danger">Stop</button>
+      <button type="button" id="shutdownBtn" class="danger">Shutdown App</button>
+    </div>
+    <div class="muted">Mode → (optional Custom) → Start</div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.min.js" type="text/javascript"></script>
+<script src="javascripts/3DScanner_ui.js" type="text/javascript"></script>
+
+
+<script>
+  function setMode(mode){
+    document.getElementById("modeid").textContent = mode;
+    document.getElementById("modePill").textContent = mode;
+
+    $("#modeStandard, #modeDetailed, #modeCustom").removeClass("active");
+    if(mode === "Standard") $("#modeStandard").addClass("active");
+    if(mode === "Detailed") $("#modeDetailed").addClass("active");
+    if(mode === "Custom") $("#modeCustom").addClass("active");
+
+    document.getElementById("customSettings").style.display = (mode === "Custom") ? "block" : "none";
+  }
+
+  // Default mode
+  setMode("Standard");
+
+  $("#modeStandard").click(() => setMode("Standard"));
+  $("#modeDetailed").click(() => setMode("Detailed"));
+  $("#modeCustom").click(() => setMode("Custom"));
+
+  // Keep state pill in sync if later JS updates #stateid
+  const stateEl = document.getElementById("stateid");
+  const statePill = document.getElementById("statePill");
+  const obs = new MutationObserver(() => statePill.textContent = stateEl.textContent);
+  obs.observe(stateEl, { childList: true });
+</script>
+</body>
+</html>
